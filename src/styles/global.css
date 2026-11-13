@@ -1,0 +1,24 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Gochi+Hand&family=Fraunces:opsz,wght@9..144,500&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #26281f;
+  --color-green: #5f7052;
+  --color-green-d: #47563c;
+  --color-coral: #c47a5a;
+  --color-cream: #f3efe6;
+  --color-paper: #fbfaf7;
+  --color-sub: #6f7263;
+  --color-line: #e3ded2;
+
+  --font-body: "Nunito", ui-sans-serif, system-ui, sans-serif;
+  --font-hand: "Gochi Hand", "Nunito", cursive;
+  --font-serif: "Fraunces", Georgia, serif;
+}
+
+body {
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}

@@ -1,0 +1,41 @@
+---
+import "../styles/global.css";
+import Generator from "../components/Generator.astro";
+
+const title = "Planted Family — design your family print";
+const description =
+  "Turn your family into a little watercolour garden: one plant or birth flower per person, sized by life stage. Download it as a PNG or PDF.";
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.ico" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+  </head>
+  <body class="bg-cream text-ink">
+    <header class="flex items-center gap-2 px-5 sm:px-8 py-4 border-b border-line">
+      <img src="/brand/emblem.webp" alt="" class="h-8 w-auto" />
+      <span class="font-hand text-green text-2xl leading-none">Planted Family</span>
+    </header>
+
+    <div class="text-center px-5 pt-8 pb-2 max-w-2xl mx-auto">
+      <p class="font-hand text-coral text-2xl">design it yourself</p>
+      <h1 class="font-extrabold tracking-tight text-3xl sm:text-4xl mt-1">
+        Build your family's little garden
+      </h1>
+      <p class="text-sub mt-3 text-[15px]">
+        Pick each person's plant or birth flower, set their season of life, and watch your family come
+        together. Everything happens in your browser.
+      </p>
+    </div>
+
+    <Generator />
+
+    <footer class="border-t border-line py-8 text-center text-sm text-sub">
+      <a href="https://plantedfamily.com" class="font-hand text-green text-xl">plantedfamily.com</a>
+    </footer>
+  </body>
+</html>

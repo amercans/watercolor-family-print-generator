@@ -1,0 +1,397 @@
+---
+// The family print generator: live preview, controls and PNG/PDF export.
+---
+
+<div class="mx-auto max-w-6xl px-4 pb-16 grid gap-6 lg:grid-cols-[380px_1fr] items-start">
+  <!-- Preview: first on mobile, sticky on desktop -->
+  <div class="order-1 lg:order-2 lg:sticky lg:top-6 min-w-0">
+    <div class="frame">
+      <div class="mount" id="mount">
+        <h2 class="ptitle" id="pvTitle"></h2>
+        <div class="pest" id="pvEst"></div>
+        <div class="prow" id="pvRow"></div>
+        <p class="ptl" id="pvTl"></p>
+      </div>
+    </div>
+    <div class="flex gap-3 mt-4">
+      <button
+        type="button"
+        id="downloadBtn"
+        class="flex-1 text-center bg-green text-cream rounded-full px-5 py-3 font-semibold hover:opacity-90 transition-opacity"
+        >Download PNG</button
+      >
+      <button
+        type="button"
+        id="downloadPdfBtn"
+        class="flex-1 text-center bg-paper text-green-d border border-line rounded-full px-5 py-3 font-semibold hover:opacity-90 transition-opacity"
+        >Download PDF</button
+      >
+    </div>
+    <div class="flex mt-3">
+      <button
+        type="button"
+        id="shuffleBtn"
+        class="w-full rounded-full px-5 py-2.5 text-sm font-semibold border border-line text-green-d bg-paper"
+        >Shuffle</button
+      >
+    </div>
+    <p id="exportStatus" class="text-center text-xs text-sub mt-3" role="status">
+      Free to download, no sign-up.
+    </p>
+  </div>
+
+  <!-- Controls -->
+  <div class="order-2 lg:order-1 bg-paper border border-line rounded-2xl p-5">
+    <div class="grp" role="group" aria-labelledby="lblTheme">
+      <p class="glabel" id="lblTheme">Theme</p><div class="btnrow">
+        <button type="button" id="tFlower" class="on" aria-pressed="true">🌸 Birth Flower</button><button
+          type="button"
+          id="tPlant"
+          aria-pressed="false">🪴 House Plant</button
+        >
+      </div>
+    </div>
+    <div class="grp">
+      <label class="glabel" for="fTitle">Family title</label><input
+        type="text"
+        id="fTitle"
+        value="The Rivers Family"
+        maxlength="40"
+      />
+    </div>
+    <div class="grp">
+      <label class="glabel" for="fSub">Small line · year</label><div class="two">
+        <input type="text" id="fSub" maxlength="40" /><input
+          type="text"
+          id="fEst"
+          value="2014"
+          maxlength="6"
+          aria-label="Year"
+        />
+      </div>
+    </div>
+    <div class="grp" role="group" aria-labelledby="lblPaper">
+      <p class="glabel" id="lblPaper">Paper tone</p><div class="btnrow swatches" id="paperBtns">
+        <button
+          type="button"
+          class="swatch on"
+          data-p="#f3efe6"
+          style="background:#f3efe6"
+          title="Cream"
+          aria-label="Cream"
+          aria-pressed="true"></button>
+        <button
+          type="button"
+          class="swatch"
+          data-p="#fbfaf7"
+          style="background:#fbfaf7"
+          title="White"
+          aria-label="White"
+          aria-pressed="false"></button>
+        <button
+          type="button"
+          class="swatch"
+          data-p="#f6ece7"
+          style="background:#f6ece7"
+          title="Blush"
+          aria-label="Blush"
+          aria-pressed="false"></button>
+        <button
+          type="button"
+          class="swatch"
+          data-p="#eef0ea"
+          style="background:#eef0ea"
+          title="Sage"
+          aria-label="Sage"
+          aria-pressed="false"></button>
+      </div>
+    </div>
+    <div class="grp" role="group" aria-labelledby="lblMembers">
+      <p class="glabel" id="lblMembers">Family members</p><div id="members"></div><button
+        type="button"
+        class="add"
+        id="addBtn">+ Add person</button
+      >
+    </div>
+    <p class="hint">
+      <b>Birth month → flower, automatically.</b> In Birth Flower mode, choose a month and the right birth flower
+      appears. In House Plant mode, choose a plant. <b>Extras</b> — a paw for a pet, and a butterfly, forget-me-not
+      or infinity to keep someone close — work in both themes. <b>Height = life stage</b>, everyone lined up
+      on one shelf.
+    </p>
+  </div>
+</div>
+
+<style is:global>
+  /* Print layout. Sizes here are mirrored by LAYOUT in src/scripts/generator.ts. */
+  .frame {
+    background: #fff;
+    border: 1px solid #d7d0c2;
+    border-radius: 6px;
+    padding: 16px;
+    box-shadow: 0 30px 66px -34px rgba(0, 0, 0, 0.5);
+  }
+  .mount {
+    position: relative;
+    background: var(--color-cream);
+    padding: 40px 22px 28px;
+    border-radius: 3px;
+    transition: background 0.25s;
+    overflow: hidden;
+  }
+  .ptitle {
+    position: relative;
+    text-align: center;
+    font-family: var(--font-serif);
+    font-weight: 500;
+    font-size: clamp(22px, 4.5vw, 30px);
+    margin: 0;
+    color: #2a2723;
+    text-wrap: balance;
+    overflow-wrap: break-word;
+  }
+  .pest {
+    position: relative;
+    text-align: center;
+    font-size: 10px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--color-sub);
+    margin: 9px 0 26px;
+  }
+  .prow {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 12px;
+    flex-wrap: nowrap;
+  }
+  .pfig {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    min-width: 0;
+  }
+  /* The image is inline-block (not a flex item) so a fixed height keeps its own aspect ratio.
+     line-height = box height makes vertical-align:bottom sit every object on the same shelf line. */
+  .pwrap {
+    height: 180px;
+    line-height: 180px;
+    text-align: center;
+  }
+  .pfig img {
+    width: auto;
+    max-width: 220px;
+    object-fit: contain;
+    object-position: bottom;
+    display: inline-block;
+    vertical-align: bottom;
+  }
+  .pnm {
+    margin-top: 10px;
+    font-family: var(--font-serif);
+    font-size: 15px;
+    color: #2a2723;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: min(104px, 100%);
+    line-height: 1.12;
+  }
+  .prl {
+    margin-top: 3px;
+    font-size: 8.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-sub);
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+  .ptl {
+    position: relative;
+    text-align: center;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 12.5px;
+    color: #b7ad97;
+    margin: 20px 0 0;
+  }
+  @media (max-width: 640px) {
+    .mount {
+      padding: 32px 10px 22px;
+    }
+    .prow {
+      gap: 4px;
+    }
+    .pfig {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+    .pwrap {
+      height: 130px;
+      line-height: 130px;
+      width: 100%;
+    }
+    .pnm {
+      font-size: 11px;
+      max-width: 100%;
+    }
+    .prl {
+      font-size: 7.5px;
+      letter-spacing: 0.08em;
+    }
+  }
+
+  .grp {
+    margin-bottom: 18px;
+  }
+  .glabel {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-sub);
+    margin-bottom: 7px;
+  }
+  input[type="text"],
+  select {
+    width: 100%;
+    padding: 9px 11px;
+    border: 1px solid var(--color-line);
+    border-radius: 8px;
+    background: #fff;
+    font-size: 14px;
+    color: var(--color-ink);
+    font-family: inherit;
+  }
+  input:focus,
+  select:focus {
+    outline: 2px solid var(--color-green);
+    border-color: transparent;
+  }
+  .btnrow {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .btnrow button {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 6px;
+    border: 1px solid var(--color-line);
+    border-radius: 9px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--color-ink);
+    white-space: nowrap;
+  }
+  .btnrow button.on {
+    background: var(--color-green);
+    color: #fff;
+    border-color: var(--color-green);
+  }
+  .swatches {
+    gap: 10px;
+  }
+  .swatches .swatch {
+    flex: 0 0 auto;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 1px var(--color-line);
+    cursor: pointer;
+    padding: 0;
+  }
+  .swatch.on {
+    box-shadow: 0 0 0 2px var(--color-green);
+  }
+  .two {
+    display: grid;
+    grid-template-columns: 1fr 90px;
+    gap: 8px;
+  }
+  .mem {
+    border: 1px solid var(--color-line);
+    border-radius: 11px;
+    padding: 11px;
+    margin-bottom: 9px;
+    background: #fff;
+  }
+  .mem .rh {
+    display: grid;
+    grid-template-columns: 1fr 36px;
+    gap: 8px;
+    margin-bottom: 7px;
+  }
+  .mem .rr {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 7px;
+  }
+  .mem .rr + .rr {
+    margin-top: 7px;
+  }
+  .rm {
+    border: 1px solid var(--color-line);
+    background: #fff;
+    border-radius: 8px;
+    height: 36px;
+    cursor: pointer;
+    color: #b5533f;
+    font-size: 17px;
+    line-height: 1;
+  }
+  .rm:hover {
+    background: #fbeee9;
+  }
+  .rm:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    background: #fff;
+  }
+  .add {
+    width: 100%;
+    padding: 11px;
+    border: 1px dashed var(--color-green);
+    border-radius: 9px;
+    background: transparent;
+    color: var(--color-green-d);
+    cursor: pointer;
+    font-size: 13.5px;
+    font-family: inherit;
+    font-weight: 700;
+  }
+  .add:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  .hint {
+    font-size: 12px;
+    color: var(--color-sub);
+    line-height: 1.6;
+    margin-top: 14px;
+  }
+  .hint b {
+    color: var(--color-ink);
+  }
+  .mem .rr.one {
+    grid-template-columns: 1fr;
+  }
+  .ph {
+    opacity: 0.32;
+  }
+</style>
+
+<script>
+  import "../scripts/generator.ts";
+</script>
